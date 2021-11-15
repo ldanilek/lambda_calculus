@@ -16,7 +16,7 @@ testIfElseFalse = testEq (simpl (subst 'B' fls ifelseTest)) (parse "w")
 testIfElseTrue = testEq (simpl (subst 'B' tru ifelseTest)) (parse "v")
 
 -- boolean expressions
-boolOp o a b = subst' [('B',b),('A',a),('O',o)] (parse "OAB")
+boolOp o a b = subst' [('B',b),('A',a),('O',o)] "OAB"
 
 and' = subst 'F' fls (parse "λb.λc.bcF")
 
@@ -30,7 +30,7 @@ testOr1 = testEq (simpl (boolOp or' tru fls)) tru
 testOr2 = testEq (simpl (boolOp or' fls tru)) tru
 testOr3 = testEq (simpl (boolOp or' fls fls)) fls
 
-not' = subst' [('F',fls), ('T',tru)] (parse "λb.bFT")
+not' = subst' [('F',fls), ('T',tru)] "λb.bFT"
 
 testNot0 = testEq (simpl (A not' tru)) fls
 testNot1 = testEq (simpl (A not' fls)) tru

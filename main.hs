@@ -5,6 +5,7 @@ import Strings
 import Semantics
 import Function
 import Bool
+import Data
 import Numeral
 
 main = do
@@ -12,5 +13,6 @@ main = do
     Semantics.test
     Function.test
     Bool.test
+    Data.test
     Numeral.test
 
