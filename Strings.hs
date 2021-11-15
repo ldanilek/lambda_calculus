@@ -50,6 +50,7 @@ parseAtom ('(':x) =
 parseAtom ('λ':s) = parseTermPrefix ('λ':s)
 parseAtom ('.':_) = error "atom cannot start with dot"
 parseAtom (')':_) = error "atom cannot start with close paren"
+parseAtom (' ':s) = (Nothing, s)
 parseAtom (x:s) = (Just (V x), s)
 parseAtom "" = (Nothing, "")
 
@@ -60,12 +61,16 @@ testEqual p x y = case x == y of
 testParse x y = let showed = show (parse x) in
     testEqual id showed y
 
+testEq :: Term -> Term -> IO ()
+testEq t t' = testEqual show t t'
+
 testParse0 = testParse "λx.x" "λx.x"
 testParse1 = testParse "λx.xz(λy.xy)" "λx.xzλy.xy"
 testParse2 = testParse "λx.xzλy.xy" "λx.xzλy.xy"
 testParse3 = testParse "(λx.xz)λy.wλw.wxyz" "(λx.xz)λy.wλw.wxyz"
 
 test = do
+    putStrLn "TEST Strings"
     testParse0
     testParse1
     testParse2

@@ -11,6 +11,7 @@ isValue (A x y) = isValue x && isValue y
 isValue x = True
 
 -- substitute [var -> v']v''
+subst :: Var -> Term -> Term -> Term
 subst var v' (V v'')
    | var == v'' = v'
    | otherwise = V v''
@@ -20,21 +21,26 @@ subst var v' (L var' v'')
 subst var v' (A v'' v''') = A (subst var v' v'') (subst var v' v''')
 
 -- simplify term as much as possible
+simpl :: Term -> Term
 simpl x | isValue x = x
 simpl (A (L x y) a) = simpl (subst x a (simpl y))
 simpl (A x y) = simpl (A (simpl x) (simpl y))
 
 
-testTrueSimpl = testEqual show (simpl (parse "(λl.λm.λn.lmn)(λt.λf.t)vw")) (parse "v")
-testFalseSimpl = testEqual show (simpl (parse "(λl.λm.λn.lmn)(λt.λf.f)vw")) (parse "w")
+testTrueSimpl = testEq (simpl (parse "(λl.λm.λn.lmn)(λt.λf.t)vw")) (parse "v")
+testFalseSimpl = testEq (simpl (parse "(λl.λm.λn.lmn)(λt.λf.f)vw")) (parse "w")
 
-testSubst0 = testEqual show (subst 't' (parse "z") (parse "tt")) (parse "zz")
-testSubst1 = testEqual show (subst 't' (parse "z") (parse "λt.t")) (parse "λt.t")
-testSubst2 = testEqual show (subst 't' (parse "xy") (parse "λz.ytz")) (parse "λz.y(xy)z")
+testSubst0 = testEq (subst 't' (parse "z") (parse "tt")) (parse "zz")
+testSubst1 = testEq (subst 't' (parse "z") (parse "λt.t")) (parse "λt.t")
+testSubst2 = testEq (subst 't' (parse "xy") (parse "λz.ytz")) (parse "λz.y(xy)z")
 -- does this make sense? is x abstract or bound
-testSubst3 = testEqual show (subst 't' (parse "xy") (parse "λx.xtz")) (parse "λx.x(xy)z")
+testSubst3 = testEq (subst 't' (parse "xy") (parse "λx.xtz")) (parse "λx.x(xy)z")
+
+subst' [] t = t
+subst' ((var, v'):r) t = subst var v' (subst' r t)
 
 test = do
+    putStrLn "TEST Semantics"
     testTrueSimpl
     testFalseSimpl
     testSubst0

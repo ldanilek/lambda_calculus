@@ -3,10 +3,14 @@ import Data.Maybe
 import Syntax
 import Strings
 import Semantics
-import Foundation
+import Function
+import Bool
+import Numeral
 
 main = do
     Strings.test
     Semantics.test
-    Foundation.test
+    Function.test
+    Bool.test
+    Numeral.test
 
