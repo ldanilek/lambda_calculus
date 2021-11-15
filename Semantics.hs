@@ -31,6 +31,19 @@ simpl (A x y) = simpl (A (simpl x) (simpl y))
 simpl (L x y) = L x (simpl y)
 
 
+simplDebug :: Term -> [(Term, Term)]
+simplDebug x | isValue x = []
+simplDebug (A (L x y) a) = let simplY = simpl y in
+    (simplDebug y) ++ (simplDebug (subst x a simplY)) ++ [((A (L x y) a), simpl (subst x a simplY))]
+simplDebug (A x y) = let simplX = simpl x in
+                    let simplY = simpl y in
+                    simplDebug x ++ simplDebug y ++ simplDebug (A simplX simplY)
+simplDebug (L x y) = simplDebug y
+
+simplDebugStr [] = ""
+simplDebugStr ((t, t'):r) = show t ++ " -> " ++ show t' ++ "\n" ++ (simplDebugStr r)
+
+
 testTrueSimpl = testEq (simpl (parse "(λl.λm.λn.lmn)(λt.λf.t)vw")) (parse "v")
 testFalseSimpl = testEq (simpl (parse "(λl.λm.λn.lmn)(λt.λf.f)vw")) (parse "w")
 

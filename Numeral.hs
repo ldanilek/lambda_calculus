@@ -33,6 +33,8 @@ testTimes0 = testEq (simpl (A (A times (c 1)) (c 1))) (c 1)
 
 test = do
     putStrLn "TEST Numeral"
+    putStrLn (show (A (A times (c 1)) (c 1)))
+    putStrLn (simplDebugStr (simplDebug (A (A times (c 1)) (c 1))))
     testC0
     testC3
     testSucc3
