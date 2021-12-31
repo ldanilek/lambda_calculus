@@ -13,6 +13,6 @@ main = do
     Semantics.test
     Function.test
     Bool.test
-    Data.test
     Numeral.test
+    Data.test
 

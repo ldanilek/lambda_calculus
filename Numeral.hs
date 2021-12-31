@@ -32,6 +32,8 @@ times = subst' [('P',plus),('0',c 0)] "λm.λn.m(P n)0"
 oneTimesOne = A (A times (c 1)) (c 1)
 testTimes0 = testEq (simpl oneTimesOne) (c 1)
 
+testTimes1 = testEq (simpl (A (A times (c 4)) (c 5))) (c 20)
+
 test = do
     putStrLn "TEST Numeral"
     putStrLn (show oneTimesOne)
@@ -43,4 +45,5 @@ test = do
     testPlus0
     testPlus1
     testTimes0
+    testTimes1
 

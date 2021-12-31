@@ -48,11 +48,13 @@ removeUnnecessaryPrimes (L x y) = L x (removeUnnecessaryPrimes y)
 removeUnnecessaryPrimes (A x y) = A (removeUnnecessaryPrimes x) (removeUnnecessaryPrimes y)
 
 -- simplify term as much as possible
-simpl :: Term -> Term
-simpl x | isValue x = removeUnnecessaryPrimes x
-simpl (A (L x y) a) = simpl (subst x a (simpl y))
-simpl (A x y) = simpl (A (simpl x) (simpl y))
-simpl (L x y) = L x (simpl y)
+simpl' :: Term -> Term
+simpl' x | isValue x = x
+simpl' (A (L x y) a) = simpl (subst x a (simpl y))
+simpl' (A x y) = simpl (A (simpl x) (simpl y))
+simpl' (L x y) = L x (simpl y)
+
+simpl x = removeUnnecessaryPrimes (simpl' x)
 
 -- Focus t1 [ss] t2 means t1 -> t2 with sub-steps ss
 data DebugStep = Focus Term [DebugStep] Term
