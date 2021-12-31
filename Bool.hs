@@ -11,14 +11,14 @@ tru = parse "λt.λf.t"
 
 ifelse = parse "λl.λm.λn.lmn"
 
-ifelseTest = subst 'T' ifelse (parse "TBvw")
-testIfElseFalse = testEq (simpl (subst 'B' fls ifelseTest)) (parse "w")
-testIfElseTrue = testEq (simpl (subst 'B' tru ifelseTest)) (parse "v")
+ifelseTest = subst (C 'T') ifelse (parse "TBvw")
+testIfElseFalse = testEq (simpl (subst (C 'B') fls ifelseTest)) (parse "w")
+testIfElseTrue = testEq (simpl (subst (C 'B') tru ifelseTest)) (parse "v")
 
 -- boolean expressions
 boolOp o a b = subst' [('B',b),('A',a),('O',o)] "OAB"
 
-and' = subst 'F' fls (parse "λb.λc.bcF")
+and' = subst (C 'F') fls (parse "λb.λc.bcF")
 
 testBool0 = testEq (simpl (boolOp and' tru fls)) fls
 testBool1 = testEq (simpl (boolOp and' tru tru)) tru
@@ -35,7 +35,7 @@ not' = subst' [('F',fls), ('T',tru)] "λb.bFT"
 testNot0 = testEq (simpl (A not' tru)) fls
 testNot1 = testEq (simpl (A not' fls)) tru
 
-xor' = subst 'N' not' (parse "λb.λc.b(Nc)c")
+xor' = subst (C 'N') not' (parse "λb.λc.b(Nc)c")
 
 testXor0 = testEq (simpl (boolOp xor' tru tru)) fls
 testXor1 = testEq (simpl (boolOp xor' tru fls)) tru

@@ -7,8 +7,8 @@ import Bool
 
 pair = parse "λf.λs.λb. b f s"
 pair' f s = subst' [('P', pair), ('F', f), ('S', s)] "PFS"
-fst' = subst 'T' tru (parse "λp. p T")
-snd' = subst 'F' fls (parse "λp. p F")
+fst' = subst (C 'T') tru (parse "λp. p T")
+snd' = subst (C 'F') fls (parse "λp. p F")
 
 fstPair = subst' [('F',fst'),('P',pair)] "F (P v w)"
 sndPair = subst' [('S',snd'),('P',pair)] "S (P v w)"

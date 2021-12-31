@@ -29,12 +29,13 @@ testPlus1 = testEq (simpl (A (A plus (c 3)) (c 4))) (c 7)
 -- multiplication
 times = subst' [('P',plus),('0',c 0)] "λm.λn.m(P n)0"
 
-testTimes0 = testEq (simpl (A (A times (c 1)) (c 1))) (c 1)
+oneTimesOne = A (A times (c 1)) (c 1)
+testTimes0 = testEq (simpl oneTimesOne) (c 1)
 
 test = do
     putStrLn "TEST Numeral"
-    putStrLn (show (A (A times (c 1)) (c 1)))
-    putStrLn (simplDebugStr (simplDebug (A (A times (c 1)) (c 1))))
+    putStrLn (show oneTimesOne)
+    putStrLn (simplDebugStr (simplDebug oneTimesOne))
     testC0
     testC3
     testSucc3

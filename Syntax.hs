@@ -1,7 +1,10 @@
 module Syntax where
 
-type Var = Char
+data Var = C Char
+    | P Var
+    deriving (Eq)
 
 data Term = V Var -- variable
     | L Var Term -- lambda
-    | A Term Term deriving (Eq) -- application
+    | A Term Term -- application
+    deriving (Eq)
