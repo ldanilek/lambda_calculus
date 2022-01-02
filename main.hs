@@ -7,6 +7,8 @@ import Function
 import Bool
 import Data
 import Numeral
+import Recursion
+import Pair
 
 main = do
     Strings.test
@@ -14,5 +16,7 @@ main = do
     Function.test
     Bool.test
     Numeral.test
+    Pair.test
     Data.test
+    Recursion.test
 
