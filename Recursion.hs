@@ -5,6 +5,7 @@ import Strings
 import Semantics
 import Numeral
 import Bool
+import Data
 
 omega = parse "(λx.xx)(λx.xx)"
 
@@ -48,6 +49,27 @@ testFactorial2 = testEq (strictSimpl fact0) (rn 1)
 fact4 = A realNat (A factorial (c 4))
 testFactorial3 = testEq (strictSimpl fact4) (rn 24)
 
+-- 5.2.11
+-- sum of numbers in list
+-- could just do λl.lP0 where l is the list, P is plus, and 0 is (c 0)
+-- but we are asked to use fix so let's.
+-- wow it's much more complex this way.
+
+-- this doesn't work because it doesn't take into account the extra argument to head'
+-- we could make it work, but let's try to use head'' instead, which should combine with the nil check.
+-- gSumList = subst' [('P', plus), ('0', c 0), ('N', isnil), ('H', head'), ('T', tail')] "λf.λl.(Nl)(λa.0)(λa.P(Hl)(f(Tl)))0"
+
+gSumList = subst' [('P', plus), ('0', c 0), ('H', head''), ('T', tail')] "λf.λl.(Hl)(λj.Pj(f(Tl)))0"
+sumList = A fix gSumList
+
+sumListTest0 = testEq (strictSimpl (A realNat (A sumList nil'))) (rn 0)
+sumListSingleton = A realNat (A sumList (list' [(c 0)]))
+sumListTest1 = testEq (strictSimpl sumListSingleton) (rn 0)
+sumListTest2 = testEq (strictSimpl (A realNat (A sumList (list' [(c 6)])))) (rn 6)
+sumListTest3 = testEq (strictSimpl (A realNat (A sumList (list' [(c 3), (c 2), (c 5)])))) (rn 10)
+
+
+
 test = do
     putStrLn "TEST Recursion"
     putStrLn (simplDebugStr (strictSimplDebug (A realNat (A fixIdentity (c 0)))))
@@ -61,4 +83,9 @@ test = do
     -- putStrLn (simplDebugPrefix 50 (strictSimplDebug' fact0))
     testFactorial2
     testFactorial3
+    sumListTest0
+    -- putStrLn (simplDebugStr (strictSimplDebug (A sumList (list' [(c 0)]))))
+    sumListTest1
+    sumListTest2
+    sumListTest3
 

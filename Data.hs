@@ -44,13 +44,17 @@ reverseTest0 = testEq (simpl (A reverse' smolList)) (parse "λc.λn.cz(cy(cxn))"
 
 -- the book hints the solution has something to do with pairs, but i was having trouble with the zero value.
 -- so instead, we reverse the list and take the head.
-tail' = subst' [('H', head'), ('R', reverse')] "λl.λz.H(Rl)z"
+-- oh... i implemented last here by mistake
+last' = subst' [('H', head'), ('R', reverse')] "λl.λz.H(Rl)z"
 
-tailTest0 = testEq (simpl (A (A tail' smolList) fls)) (parse "z")
-tailTest1 = testEq (simpl (A (A tail' nil') tru)) tru
+lastTest0 = testEq (simpl (A (A last' smolList) fls)) (parse "z")
+lastTest1 = testEq (simpl (A (A last' nil') tru)) tru
+
+
 
 -- Optionals
 -- could be represented as a list of len <= 1, but designing them from scratch is an exercise.
+-- an optional takes two arguments c z. if it's None, it returns z. if it's Some j, it returns (c j)
 some' = parse "λj.λc.λz.cj"
 none' = parse "λc.λz.z"
 
@@ -66,9 +70,15 @@ head'' = subst' [('S', some'), ('N', none')] "λl.l(λx.λr.Sx)N"
 headTest2 = testEq (simpl (A head'' smolList)) (simpl (A some' (V (C 'x'))))
 headTest3 = testEq (simpl (A head'' nil')) none'
 
-tail'' = subst' [('S', some'), ('N', none')] "λl.l(λx.λr.r(λj.r)(Sx))N"
-tailTest2 = testEq (simpl (A tail'' smolList)) (simpl (A some' (parse "z")))
-tailTest3 = testEq (simpl (A tail'' nil')) none'
+last'' = subst' [('S', some'), ('N', none')] "λl.l(λx.λr.r(λj.r)(Sx))N"
+lastTest2 = testEq (simpl (A last'' smolList)) (simpl (A some' (parse "z")))
+lastTest3 = testEq (simpl (A last'' nil')) none'
+
+tail' = subst' [
+    ('P', pair), ('F', fst'), ('S', snd'), ('C', cons), ('N', nil')] "λl.S(l(λx.λr.P(Cx(Fr))(Fr)) (PNN))"
+
+tailTest0 = testEq (simpl (A tail' smolList)) (list' [V (C 'y'), V (C 'z')])
+tailTest1 = testEq (simpl (A tail' nil')) nil'
 
 test = do
     putStrLn "TEST Data"
@@ -81,13 +91,15 @@ test = do
     headTest1
     appendTest0
     reverseTest0
-    tailTest0
-    tailTest1
+    lastTest0
+    lastTest1
     optionalTest0
     -- putStrLn (simplDebugStr (simplDebug someThreeSuccessor))
     optionalTest1
     headTest2
     headTest3
-    tailTest2
-    tailTest3
+    lastTest2
+    lastTest3
+    tailTest0
+    tailTest1
 

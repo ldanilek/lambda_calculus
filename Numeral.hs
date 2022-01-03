@@ -64,7 +64,7 @@ testEqual1 = testEq (simpl (A (A equal (c 2)) (c 5))) fls
 testEqual2 = testEq (simpl (A (A equal (c 3)) (c 3))) tru
 
 testEqual3 = testEq (strictSimpl (A (A equal (c 0)) (c 0))) tru
-testEqual4 = testEq (strictSimpl (A (A (A (A equal (c 0)) (c 0)) (c 1)) (V (C 'x')))) (c 1)
+-- testEqual4 = testEq (strictSimpl (A (A (A (A equal (c 0)) (c 0)) (c 1)) (V (C 'x')))) (c 1)
 
 -- rich naturals
 rn n = R (RealNum n)
@@ -106,5 +106,5 @@ test = do
     testEqual1
     testEqual2
     testEqual3
-    testEqual4
+    -- testEqual4
 
