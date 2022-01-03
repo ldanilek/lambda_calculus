@@ -6,6 +6,7 @@ import Semantics
 import Pair
 import Bool
 import Enrichment
+import Test
 
 applyTimes 0 = "z"
 applyTimes n | n > 0 = "s("++(applyTimes (n-1))++")"

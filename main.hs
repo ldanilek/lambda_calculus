@@ -11,6 +11,7 @@ import Recursion
 import Pair
 
 main = do
+    Syntax.test
     Strings.test
     Semantics.test
     Function.test

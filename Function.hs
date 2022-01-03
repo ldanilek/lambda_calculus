@@ -4,6 +4,7 @@ import Syntax
 import Strings
 import Semantics
 import Enrichment
+import Test
 
 -- identity function
 id' = parseTerm "λx.x"

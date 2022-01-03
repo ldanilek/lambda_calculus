@@ -6,6 +6,7 @@ import Semantics
 import Bool
 import Numeral
 import Pair
+import Test
 
 list' :: [Term] -> Term
 list' [] = parse "λc.λn.n"

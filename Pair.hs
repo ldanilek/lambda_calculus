@@ -4,6 +4,7 @@ import Syntax
 import Strings
 import Semantics
 import Bool
+import Test
 
 pair = parse "λf.λs.λb. b f s"
 pair' f s = subst' [('P', pair), ('F', f), ('S', s)] "PFS"

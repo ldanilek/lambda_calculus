@@ -5,6 +5,7 @@ import Data.Maybe
 import Syntax
 import Strings
 import Enrichment
+import Test
 
 -- a "value" is a term that is finished computing and cannot be reduced any further.
 -- the book says lambda abstractions are values, but it's nice to be able to simplify

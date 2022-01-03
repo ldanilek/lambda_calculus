@@ -7,6 +7,7 @@ import Strings
 import Semantics
 import Enrichment
 import Function
+import Test
 
 fls = parse "λt.λf.f"
 tru = parse "λt.λf.t"

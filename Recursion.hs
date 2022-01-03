@@ -6,6 +6,7 @@ import Semantics
 import Numeral
 import Bool
 import Data
+import Test
 
 omega = parse "(λx.xx)(λx.xx)"
 

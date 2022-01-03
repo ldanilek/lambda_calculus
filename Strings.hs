@@ -3,15 +3,9 @@ module Strings where
 import Syntax
 import Data.Maybe
 import Enrichment
+import Test
 
 -- pretty-print a term, omitting parentheses when possible
-
-showVar :: Var -> String
-showVar (C c) = [c]
-showVar (P v) = (showVar v) ++ "'"
-
-instance Show Var where
-    show v = showVar v
 
 showTerm :: Term -> Bool -> Bool -> String
 showTerm (V var) paren paren' = showVar var
@@ -82,15 +76,11 @@ parseAtom (x:s) = case parseVar (x:s) of
     (Nothing, s') -> (Nothing, s')
 parseAtom "" = (Nothing, "")
 
-testEqual p x y = case x == y of
-    True -> putStrLn ("PASS: " ++ (p x) ++ " = " ++ (p y))
-    False -> putStrLn ("ERROR: " ++ (p x) ++ " != " ++ (p y))
 
 testParse x y = let showed = show (parse x) in
     testEqual id showed y
 
-testEq :: Term -> Term -> IO ()
-testEq t t' = testEqual show t t'
+
 
 testParse0 = testParse "λx.x" "λx.x"
 testParse1 = testParse "λx.xz(λy.xy)" "λx.xzλy.xy"

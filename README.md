@@ -4,10 +4,16 @@
 
 Install Docker.
 
+Run this
+
+```
+docker build . -t haskell:local
+```
+
 Put this in your bash profile
 
 ```
-alias haskell='docker run -it -v $PWD:/home -w /home haskell'
+alias haskell='docker run -it -v $PWD:/home -w /home haskell:local'
 ```
 
 ## Compiling and running
