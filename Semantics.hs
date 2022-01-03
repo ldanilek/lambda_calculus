@@ -4,6 +4,7 @@ import Control.Exception
 import Data.Maybe
 import Syntax
 import Strings
+import Enrichment
 
 -- a "value" is a term that is finished computing and cannot be reduced any further.
 -- the book says lambda abstractions are values, but it's nice to be able to simplify
@@ -13,6 +14,10 @@ isValue (A x y) = isValue x && isValue y
 isValue (L x y) = isValue y
 isValue x = True
 
+isStrictValue (L x y) = True
+isStrictValue (R x) = True
+isStrictValue x = False
+
 containsAbstract :: Term -> Var -> Bool
 containsAbstract (V a) a'
     | a == a' = True
@@ -21,6 +26,7 @@ containsAbstract (L a t) a'
     | a == a' = False
     | otherwise = containsAbstract t a'
 containsAbstract (A t t') a = containsAbstract t a || containsAbstract t' a
+containsAbstract (R _) _ = False
 
 nextNonAbstract :: Term -> Term -> Var -> Var
 nextNonAbstract t t' v
@@ -39,6 +45,7 @@ subst var v' (L var' v'')
     | otherwise = let newBound = nextNonAbstract v' (L var' v'') var' in
         L newBound (subst var v' (subst var' (V newBound) v''))
 subst var v' (A v'' v''') = A (subst var v' v'') (subst var v' v''')
+subst _ _ (R r) = R r
 
 removeUnnecessaryPrimes :: Term -> Term
 removeUnnecessaryPrimes (V v) = (V v)
@@ -46,8 +53,30 @@ removeUnnecessaryPrimes (L (P x) y)
     | not (containsAbstract y x) = L x (removeUnnecessaryPrimes (subst (P x) (V x) y))
 removeUnnecessaryPrimes (L x y) = L x (removeUnnecessaryPrimes y)
 removeUnnecessaryPrimes (A x y) = A (removeUnnecessaryPrimes x) (removeUnnecessaryPrimes y)
+removeUnnecessaryPrimes (R r) = R r
 
--- simplify term as much as possible
+isRedex :: Term -> Bool
+isRedex (A (L x y) a) = True
+isRedex x = False
+
+-- is reducible in call-by-value strategy
+isStrictRedex :: Term -> Bool
+isStrictRedex (A (L x y) a) | isStrictValue a = True
+isStrictRedex x = False
+
+betaReduce :: Term -> Term
+betaReduce (A (L x y) a) = subst x a y
+betaReduce x = x
+
+-- does the leftmost strict beta reduction
+betaReduceStrict :: Term -> (Term, Bool)
+betaReduceStrict x | isStrictRedex x = (betaReduce x, True)
+betaReduceStrict (A (R (RealFunction _ f)) (R x)) = (R (f x), True)
+betaReduceStrict (A x y) = let (x', r) = betaReduceStrict x in
+    if r then (A x' y, True) else let (y', r) = betaReduceStrict y in (A x y', r)
+betaReduceStrict x = (x, False)
+
+-- simplify term as much as possible, with full beta-reduction.
 simpl' :: Term -> Term
 simpl' x | isValue x = x
 simpl' (A (L x y) a) = simpl (subst x a (simpl y))
@@ -55,6 +84,15 @@ simpl' (A x y) = simpl (A (simpl x) (simpl y))
 simpl' (L x y) = L x (simpl y)
 
 simpl x = removeUnnecessaryPrimes (simpl' x)
+
+-- simplify using call-by-value only
+-- i.e. in normal order (left-to-right) beta reduce if isStrictRedex,
+-- and don't reduce inside lambda-abstractions.
+strictSimpl' :: Term -> Term
+strictSimpl' x = let (x', r) = betaReduceStrict x in
+    if r then strictSimpl' x' else x
+
+strictSimpl x = removeUnnecessaryPrimes (strictSimpl' x)
 
 -- Focus t1 [ss] t2 means t1 -> t2 with sub-steps ss
 data DebugStep = Focus Term [DebugStep] Term
@@ -68,6 +106,12 @@ simplDebug (A x y) = let simplX = simpl x in
                     Focus (A x y) [simplDebug x, simplDebug y, simplDebug (A simplX simplY)] (simpl (A x y))
 simplDebug (L x y) = Focus (L x y) [simplDebug y] (simpl (L x y))
 
+strictSimplDebug' :: Term -> [DebugStep]
+strictSimplDebug' x = let (x', r) = betaReduceStrict x in
+    if r then ((Focus x [] x') : strictSimplDebug' x') else []
+
+strictSimplDebug x = Focus x (strictSimplDebug' x) (strictSimpl x)
+
 indentStr 0 = ""
 indentStr n = "｜" ++ indentStr (n-1)
 simplDebugStr' :: Integer -> [DebugStep] -> [String]
@@ -76,6 +120,9 @@ simplDebugStr' i [Focus t1 ss t2] = (indentStr i ++ show t1 ++ " -> " ++ show t2
 simplDebugStr' i (ds:dss) = simplDebugStr' i [ds] ++ simplDebugStr' i dss
 
 simplDebugStr ds = unlines (simplDebugStr' 0 [ds])
+
+-- to debug infinite loops. relies on lazy evaluation.
+simplDebugPrefix c ds = unlines (take c (simplDebugStr' 0 ds))
 
 
 testTrueSimpl = testEq (simpl (parse "(λl.λm.λn.lmn)(λt.λf.t)vw")) (parse "v")

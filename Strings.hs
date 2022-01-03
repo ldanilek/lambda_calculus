@@ -2,6 +2,7 @@ module Strings where
 
 import Syntax
 import Data.Maybe
+import Enrichment
 
 -- pretty-print a term, omitting parentheses when possible
 
@@ -16,6 +17,7 @@ showTerm :: Term -> Bool -> Bool -> String
 showTerm (V var) paren paren' = showVar var
 showTerm (L var term) False paren' = "λ" ++ showVar var ++ "." ++ (showTerm term False False)
 showTerm (A term term') paren False = showTerm term True False ++ showTerm term' paren True
+showTerm (R rich) paren paren' = showRich rich 
 showTerm x paren paren' | paren || paren' = "(" ++ showTerm x False False ++ ")"
 
 instance Show Term where

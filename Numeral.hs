@@ -5,6 +5,7 @@ import Strings
 import Semantics
 import Pair
 import Bool
+import Enrichment
 
 applyTimes 0 = "z"
 applyTimes n | n > 0 = "s("++(applyTimes (n-1))++")"
@@ -61,6 +62,24 @@ equal = subst' [('S', sub), ('A', and'), ('Z', iszro)] "λn.λm.A(Z(Snm))(Z(Smn)
 testEqual0 = testEq (simpl (A (A equal (c 5)) (c 2))) fls
 testEqual1 = testEq (simpl (A (A equal (c 2)) (c 5))) fls
 testEqual2 = testEq (simpl (A (A equal (c 3)) (c 3))) tru
+
+-- rich naturals
+rn n = R (RealNum n)
+
+realSuccFunc (RealNum x) = RealNum (x+1)
+
+realSucc = R (RealFunction "succ" realSuccFunc)
+
+realNat = subst' [('S', realSucc), ('0', rn 0)] "λm.m(λx.Sx)0"
+
+realEqFunc' x (RealNum y) = RealBool (x == y)
+realEqFunc (RealNum x) = RealFunction ("eq:" ++ show x) (realEqFunc' x)
+realEq = RealFunction "eq" realEqFunc
+
+-- realeq in the book takes two church numerals and outputs a real bool
+-- but the "equal" function on church numerals is uber complicated,
+-- so what happens if we convert the church numerals to naturals first, then compare.
+realEq' = subst' [('R', R realEq), ('N', realNat)] "λn.λm.R(Nn)(Nm)"
 
 test = do
     putStrLn "TEST Numeral"

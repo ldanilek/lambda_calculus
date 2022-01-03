@@ -5,6 +5,8 @@ import Data.Maybe
 import Syntax
 import Strings
 import Semantics
+import Enrichment
+import Function
 
 fls = parse "λt.λf.f"
 tru = parse "λt.λf.t"
@@ -41,6 +43,16 @@ testXor0 = testEq (simpl (boolOp xor' tru tru)) fls
 testXor1 = testEq (simpl (boolOp xor' tru fls)) tru
 testXor2 = testEq (simpl (boolOp xor' fls tru)) tru
 testXor3 = testEq (simpl (boolOp xor' fls fls)) fls
+
+-- rich bool
+rb b = R (RealBool b)
+
+realIfFuncTrue r = RealFunction ("unary:"++show r) (\x -> r)
+realIfFuncFalse r = realId
+realIfFunc (RealBool b) = if b then (RealFunction "iftru" realIfFuncTrue) else (RealFunction "iffls" realIfFuncFalse)
+realIf = RealFunction "if" realIfFunc
+
+realBool = subst' [('T', rb True), ('F', rb False)] "λb.bTF"
 
 test = do
     putStrLn "TEST Bool"
