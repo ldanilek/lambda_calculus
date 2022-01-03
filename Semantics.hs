@@ -72,6 +72,8 @@ betaReduce x = x
 betaReduceStrict :: Term -> (Term, Bool)
 betaReduceStrict x | isStrictRedex x = (betaReduce x, True)
 betaReduceStrict (A (R (RealFunction _ f)) (R x)) = (R (f x), True)
+betaReduceStrict (A (A (R (RealIf True)) x) _) = (x, True)
+betaReduceStrict (A (A (R (RealIf False)) _) x) = (x, True)
 betaReduceStrict (A x y) = let (x', r) = betaReduceStrict x in
     if r then (A x' y, True) else let (y', r) = betaReduceStrict y in (A x y', r)
 betaReduceStrict x = (x, False)

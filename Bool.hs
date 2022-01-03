@@ -47,9 +47,7 @@ testXor3 = testEq (simpl (boolOp xor' fls fls)) fls
 -- rich bool
 rb b = R (RealBool b)
 
-realIfFuncTrue r = RealFunction ("unary:"++show r) (\x -> r)
-realIfFuncFalse r = realId
-realIfFunc (RealBool b) = if b then (RealFunction "iftru" realIfFuncTrue) else (RealFunction "iffls" realIfFuncFalse)
+realIfFunc (RealBool b) = RealIf b
 realIf = RealFunction "if" realIfFunc
 
 realBool = subst' [('T', rb True), ('F', rb False)] "λb.bTF"
